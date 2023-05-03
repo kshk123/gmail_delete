@@ -1,0 +1,12 @@
+<p>Bulk delete mails from your gmail account, based on a search crtiteria.</p>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label>Email Address:</label>
+    <input type="email" formControlName="email_id" required>
+    
+    <label>Search Query:</label>
+    <input type="text" formControlName="search_query" required>
+    
+    <button type="submit">Delete Emails</button>
+  </form>
+
