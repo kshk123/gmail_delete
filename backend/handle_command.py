@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import subprocess
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -16,8 +17,22 @@ def delete_emails():
 
     # Return the script output as a JSON response
     retVal = stdout.decode('utf-8', errors='ignore')
-    print(f'{retVal} .')
-    response = jsonify({'stdout': stdout.decode('utf-8', errors='ignore')})
+    print(f'{retVal}')
+   
+    # Define regular expression to match the string
+    regex = r"Output:\s+(.*)"
+
+    # Find the first match      
+    match = re.search(regex, retVal)
+
+    output_str = ""
+    if match:
+        # Extract the matched string
+        output_str = match.group(1)
+        print(output_str)
+
+
+    response = jsonify({'result': output_str})
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')

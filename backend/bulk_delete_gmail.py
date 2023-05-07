@@ -11,7 +11,7 @@ def get_message_ids(service, query, user_id):
         message_ids = []
 
         # Retrieve the first page of messages
-        response = service.users().messages().list(userId='me', q=query).execute()
+        response = service.users().messages().list(userId=user_id, q=query).execute()
         messages = response.get('messages', [])
         message_ids += [m['id'] for m in messages]
 
@@ -30,7 +30,7 @@ def get_message_ids(service, query, user_id):
         print('An error occurred: %s' % error)
         return []
 
-def bulk_delete(service, message_ids):
+def bulk_delete(service, message_ids, query, user_id):
     try:
         # Batch delete the messages
         batch = service.new_batch_http_request()
@@ -38,7 +38,11 @@ def bulk_delete(service, message_ids):
             batch.add(service.users().messages().delete(userId='me', id=message_id))
         batch.execute()
 
-        print(f'{len(message_ids)} messages successfully deleted')
+        numDeleted = len(message_ids)
+        if numDeleted > 1:
+            print(f'{numDeleted} messages successfully deleted for email id {user_id} and search query {query}')
+        else:
+            print(f'{numDeleted} message successfully deleted for email id {user_id} and search query {query}')
 
     except HttpError as error:
         print('An error occurred: %s' % error)
@@ -62,8 +66,10 @@ def main(user_id, search_query):
     # Get the message IDs that match the query
     message_ids = get_message_ids(service, search_query, user_id)
 
+    print('Output: ');
+
     # Bulk delete the messages
-    bulk_delete(service, message_ids)
+    bulk_delete(service, message_ids, search_query, user_id)
 
 
 if __name__ == '__main__':

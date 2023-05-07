@@ -8,12 +8,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DeleteGmailFormComponent, ConfirmationDialogComponent } from './delete-gmail-form/delete-gmail-form.component';
+import { DialogBoxComponent } from './dialog-box/dialog-box.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DeleteGmailFormComponent,
-    ConfirmationDialogComponent
+    ConfirmationDialogComponent,
+    DialogBoxComponent
   ],
   imports: [
     BrowserModule,

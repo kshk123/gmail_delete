@@ -2,6 +2,7 @@ import { Component, OnInit, Inject, InjectionToken } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DialogBoxComponent } from '../dialog-box/dialog-box.component';
 
 @Component({
   selector: 'app-delete-gmail-form',
@@ -23,11 +24,21 @@ export class DeleteGmailFormComponent implements OnInit {
     });
   }
 
-  confirmDelete() {
-    if (confirm("Are you sure you want to delete the emails?")) {
-      this.onSubmit();
-    }
+  openDialog(title: string, message: string): void {
+    const dialogRef = this.dialog.open(DialogBoxComponent, {
+      width: '300px',
+      data: { title, message }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
+
+  clearForm(): void {
+    this.form.reset();
+  }
+  
 
   onSubmit(): void {
     // Get the user input values from the form
@@ -37,9 +48,12 @@ export class DeleteGmailFormComponent implements OnInit {
     // Send an HTTP request to the backend server to execute the Python script
     this.http.post('http://127.0.0.1:5000/delete-gmails', { email, query }).subscribe(
       (response) => {
-        // Handle successful response from server
-        this.serverResponse = response.toString();
+        // Handle successful response from server        
         console.log(response);
+        const msg = JSON.stringify(response);
+        const dialogRef = this.dialog.open(DialogBoxComponent, {
+          data: { title: 'Server Response', message: msg, clearForm: this.clearForm.bind(this) }
+        });
       },
       (error) => {
         // Handle error response from server
@@ -71,15 +85,16 @@ export class DeleteGmailFormComponent implements OnInit {
 @Component({
   selector: 'app-confirmation-dialog',
   template: `
-    <h1 mat-dialog-title>Confirm Delete?</h1>
+    <h1 mat-dialog-title>Confirm Delete</h1>
     <div mat-dialog-content>
       <p>Are you sure you want to delete emails with the following criteria?</p>
-      <p><strong>Email:</strong> {{ data.email_id }}</p>
-      <p><strong>Search Query:</strong> {{ data.search_query }}</p>
+      <p><strong>Email:</strong> <mark>{{ data.email_id }}</mark></p>
+      <p><strong>Search Query:</strong> <mark>{{ data.search_query }}</mark></p>
+      <p><mark style="color: red">Please note that the deleted mails are deleted permanently and cannot be recovered.</mark></p> 
     </div>
     <div mat-dialog-actions>
-      <button mat-button [mat-dialog-close]="false">No</button>
-      <button mat-button [mat-dialog-close]="true">Yes</button>
+      <button mat-button color="primary" style="color: blue !important" [mat-dialog-close]="false">No</button>
+      <button mat-button color="warn" style="color: red !important" [mat-dialog-close]="true">Yes</button>
     </div>
   `
 })
